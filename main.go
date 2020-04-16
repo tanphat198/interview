@@ -1,32 +1,27 @@
 package main
 
 import (
-	"ProjectManagement/config"
-	"ProjectManagement/model"
+	"ProjectManagement/server/controllers"
 	"fmt"
-	"net/http"
+
+	"github.com/gin-gonic/gin"
 
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/qor/admin"
 )
 
 func main() {
-	DB := config.GetDB()
-	DB.AutoMigrate(&model.Member{}, &model.Project{})
+	r := gin.Default()
+	api := r.Group("/api")
+	{
+		api.POST("/project", controllers.CreateProject)
+		api.POST("/member", controllers.CreateMember)
+		api.GET("/members", controllers.GetAllMembers)
+	}
 
-	// Initialize
-	Admin := admin.New(&admin.AdminConfig{DB: DB})
-
-	// Allow to use Admin to manage Project, Member
-	Admin.AddResource(&model.Project{})
-	Admin.AddResource(&model.Member{})
-
-	// initalize an HTTP request multiplexer
-	mux := http.NewServeMux()
-
-	// Mount admin interface to mux
-	Admin.MountTo("/admin", mux)
-
-	fmt.Println("Listening on: 9000, go to http://localhost:9000/admin")
-	http.ListenAndServe(":9000", mux)
+	// Start and run the server
+	fmt.Print("running on localhost:9000")
+	err := r.Run(":9000")
+	if err != nil {
+		fmt.Print(err)
+	}
 }

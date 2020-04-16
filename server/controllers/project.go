@@ -1,15 +1,15 @@
 package controllers
 
 import (
-	"ProjectManagement/model"
-	"ProjectManagement/repo"
-	"capstone/go-contacts/utils"
+	"ProjectManagement/server/model"
+	"ProjectManagement/server/repo"
+	"ProjectManagement/server/utils"
 	"log"
 
 	"github.com/gin-gonic/gin"
 )
 
-func GetProjectWithName(c *gin.Context) {
+var GetProjectWithName = func(c *gin.Context) {
 	name := c.Params.ByName("name")
 	var project *model.Project
 	err := repo.GetProjectWithName(project, name)
@@ -21,7 +21,7 @@ func GetProjectWithName(c *gin.Context) {
 	utils.Respond(c.Writer, resp)
 }
 
-func CreateProject(c *gin.Context) {
+var CreateProject = func(c *gin.Context) {
 	project := model.Project{}
 	err := c.ShouldBindJSON(&project)
 	if err != nil {
