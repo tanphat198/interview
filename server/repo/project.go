@@ -25,3 +25,10 @@ func GetProjectWithName(project *model.Project, name string) error {
 	}
 	return nil
 }
+
+func GetAllProject(project *[]model.Project) error {
+	if err := config.GetDB().Find(project).Error; err != nil {
+		return err
+	}
+	return nil
+}

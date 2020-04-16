@@ -13,9 +13,12 @@ func main() {
 	r := gin.Default()
 	api := r.Group("/api")
 	{
-		api.POST("/project", controllers.CreateProject)
-		api.POST("/member", controllers.CreateMember)
+		api.POST("/projects/new", controllers.CreateProject)
+		api.POST("/members/new", controllers.CreateMember)
 		api.GET("/members", controllers.GetAllMembers)
+		api.GET("/projects", controllers.GetAllProjects)
+		api.PUT("/projects/{:projectId}", controllers.UpdateProject)
+		api.PUT("/members/{:memberId}", controllers.UpdateMember)
 	}
 
 	// Start and run the server
