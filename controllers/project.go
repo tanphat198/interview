@@ -20,3 +20,19 @@ func GetProjectWithName(c *gin.Context) {
 	resp["data"] = project
 	utils.Respond(c.Writer, resp)
 }
+
+func CreateProject(c *gin.Context) {
+	project := model.Project{}
+	err := c.ShouldBindJSON(&project)
+	if err != nil {
+		utils.Respond(c.Writer, utils.Message(false, "Error while decoding request body"))
+		return
+	}
+	err = repo.CreateProject(&project)
+	if err != nil {
+		log.Print("can not create project", err)
+	}
+	resp := utils.Message(true, "success")
+	resp["data"] = project
+	utils.Respond(c.Writer, resp)
+}
