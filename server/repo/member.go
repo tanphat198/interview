@@ -3,6 +3,7 @@ package repo
 import (
 	"ProjectManagement/server/config"
 	"ProjectManagement/server/model"
+	"time"
 )
 
 func CreateMember(member *model.Member) error {
@@ -19,8 +20,8 @@ func GetMemberWithId(member *model.Member, id int64) error {
 	return nil
 }
 
-func UpdateMember(member *model.Member) error {
-	if err := config.GetDB().Save(member).Error; err != nil {
+func UpdateMemberWithId(member *model.Member, id int64) error {
+	if err := config.GetDB().Table("member").Where("id = ?", id).Update("name", member.Name).Update("phone", member.Phone).Update("birthday", member.Birthday).Update("updated_at", time.Now()).Error; err != nil {
 		return err
 	}
 	return nil
