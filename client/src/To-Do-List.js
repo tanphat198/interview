@@ -11,7 +11,7 @@ class ToDoList extends Component {
 
         this.state = {
             memberName: "",
-            memberPhone: "" ,
+            memberPhone: "",
             memberBirthday: new Date(),
             items: []
         };
