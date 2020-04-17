@@ -12,8 +12,8 @@ func CreateProject(project *model.Project) error {
 	return nil
 }
 
-func UpdateProject(project *model.Project) error {
-	if err := config.GetDB().Save(project).Error; err != nil {
+func UpdateProject(pId int64, id int64) error {
+	if err := config.GetDB().Table("project").Where("id = ?", pId).Update("member_id", id).Error; err != nil {
 		return err
 	}
 	return nil

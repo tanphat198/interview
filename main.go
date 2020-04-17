@@ -1,7 +1,9 @@
 package main
 
 import (
+	"ProjectManagement/server/config"
 	"ProjectManagement/server/controllers"
+	"ProjectManagement/server/model"
 	"fmt"
 
 	"github.com/gin-gonic/gin"
@@ -10,6 +12,7 @@ import (
 )
 
 func main() {
+	config.GetDB().AutoMigrate(model.Project{}, model.Member{})
 	r := gin.Default()
 	api := r.Group("/api")
 	{
@@ -17,8 +20,8 @@ func main() {
 		api.POST("/members/new", controllers.CreateMember)
 		api.GET("/members", controllers.GetAllMembers)
 		api.GET("/projects", controllers.GetAllProjects)
-		api.PUT("/projects/{:projectId}", controllers.UpdateProject)
-		api.PUT("/members/{:memberId}", controllers.UpdateMember)
+		api.PUT("/projects/:projectId", controllers.UpdateProject)
+		api.PUT("/members/:memberId", controllers.UpdateMember)
 	}
 
 	// Start and run the server

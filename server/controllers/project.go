@@ -4,7 +4,9 @@ import (
 	"ProjectManagement/server/model"
 	"ProjectManagement/server/repo"
 	"ProjectManagement/server/utils"
+	"fmt"
 	"log"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -22,11 +24,24 @@ var GetProjectWithName = func(c *gin.Context) {
 }
 
 var CreateProject = func(c *gin.Context) {
+	memberId := c.Params.ByName("memberId")
+	id, err := strconv.ParseInt(memberId, 10, 64)
+	if err == nil {
+		fmt.Printf("%d of type %T", id, id)
+	}
 	project := model.Project{}
-	err := c.ShouldBindJSON(&project)
+	err = c.ShouldBindJSON(&project)
 	if err != nil {
 		utils.Respond(c.Writer, utils.Message(false, "Error while decoding request body"))
 		return
+	}
+	if memberId != "" {
+		member := model.Member{}
+		err := repo.GetMemberWithId(&member, id)
+		if err != nil {
+			utils.Respond(c.Writer, utils.Message(false, "Can not find this member"))
+			return
+		}
 	}
 	err = repo.CreateProject(&project)
 	if err != nil {
@@ -50,17 +65,36 @@ var GetAllProjects = func(c *gin.Context) {
 }
 
 var UpdateProject = func(c *gin.Context) {
+	//memberId := c.Params.ByName("memberId")
+	projectId := c.Params.ByName("projectId")
+	pId, err := strconv.ParseInt(projectId, 10, 64)
+	if err == nil {
+		fmt.Printf("%d of type %T", pId, pId)
+	}
+	//id, err := strconv.ParseInt(memberId, 10, 64)
+	//if err == nil {
+	//	fmt.Printf("%d of type %T", id, id)
+	//}
 	project := model.Project{}
 
-	err := c.ShouldBindJSON(&project)
+	err = c.ShouldBindJSON(&project)
 	if err != nil {
 		utils.Respond(c.Writer, utils.Message(false, "Error while decoding request body"))
 		return
 	}
 
-	err = repo.UpdateProject(&project)
+	if project.MemberId != -1 {
+		member := model.Member{}
+		err := repo.GetMemberWithId(&member, project.MemberId)
+		if err != nil {
+			utils.Respond(c.Writer, utils.Message(false, "Can not find this member"))
+			return
+		}
+	}
+	project.ID = uint(pId)
+	err = repo.UpdateProject(pId, project.MemberId)
 	if err != nil {
-		log.Print("can not update brand", err)
+		log.Print("can not update project", err)
 	}
 	resp := utils.Message(true, "success")
 	resp["data"] = project
