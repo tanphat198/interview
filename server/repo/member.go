@@ -13,11 +13,12 @@ func CreateMember(member *model.Member) error {
 	return nil
 }
 
-func GetMemberWithId(member *model.Member, id int64) error {
+func GetMemberWithId(id int64) (*model.Member, error) {
+	member := new(model.Member)
 	if err := config.GetDB().Table("member").Where("id = ?", id).First(member).Error; err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return member, nil
 }
 
 func UpdateMemberWithId(member *model.Member, id int64) error {

@@ -36,12 +36,12 @@ var CreateProject = func(c *gin.Context) {
 		return
 	}
 	if memberId != "" {
-		member := model.Member{}
-		err := repo.GetMemberWithId(&member, id)
+		member, err := repo.GetMemberWithId(id)
 		if err != nil {
 			utils.Respond(c.Writer, utils.Message(false, "Can not find this member"))
 			return
 		}
+		project.Member = member
 	}
 	err = repo.CreateProject(&project)
 	if err != nil {
@@ -49,17 +49,23 @@ var CreateProject = func(c *gin.Context) {
 	}
 	resp := utils.Message(true, "success")
 	resp["data"] = project
+	resp["member"] = project.Member
 	utils.Respond(c.Writer, resp)
 }
 
 var GetAllProjects = func(c *gin.Context) {
 	var projects []model.Project
+	resp := utils.Message(true, "success")
 	err := repo.GetAllProject(&projects)
 	if err != nil {
 		log.Print("can not get all members", err)
 	}
-
-	resp := utils.Message(true, "success")
+	for _, project := range projects {
+		if project.MemberId != -1 {
+			member, _ := repo.GetMemberWithId(project.MemberId)
+			project.Member = member
+		}
+	}
 	resp["data"] = projects
 	utils.Respond(c.Writer, resp)
 }
@@ -75,7 +81,7 @@ var UpdateProject = func(c *gin.Context) {
 	//if err == nil {
 	//	fmt.Printf("%d of type %T", id, id)
 	//}
-	project := model.Project{}
+	project := new(model.Project)
 
 	err = c.ShouldBindJSON(&project)
 	if err != nil {
@@ -84,12 +90,12 @@ var UpdateProject = func(c *gin.Context) {
 	}
 
 	if project.MemberId != -1 {
-		member := model.Member{}
-		err := repo.GetMemberWithId(&member, project.MemberId)
+		member, err := repo.GetMemberWithId(project.MemberId)
 		if err != nil {
 			utils.Respond(c.Writer, utils.Message(false, "Can not find this member"))
 			return
 		}
+		project.Member = member
 	}
 	project.ID = uint(pId)
 	err = repo.UpdateProject(pId, project.MemberId)
@@ -98,5 +104,6 @@ var UpdateProject = func(c *gin.Context) {
 	}
 	resp := utils.Message(true, "success")
 	resp["data"] = project
+	resp["member"] = project.Member
 	utils.Respond(c.Writer, resp)
 }
